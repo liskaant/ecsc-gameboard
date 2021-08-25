@@ -6,8 +6,12 @@
 
         logMessage("Reset action initiated", LogLevel::DEBUG);
 
-        if ($_POST["teams"] == "true")
-            $success &= execute("DELETE FROM teams WHERE login_name!=:login_name", array("login_name" => ADMIN_LOGIN_NAME));
+        if ($_POST["teams"] == "true") {
+            $users = fetchAll("SELECT team_id, login_name FROM teams");
+            foreach($users as $user)
+                if(!in_array($user['login_name'], ADMIN_LOGIN_NAMES, true))
+                    $success &= execute("DELETE FROM teams WHERE team_id = :id", ["id" => $user['team_id']]);
+        }
 
         if ($_POST["contracts"] == "true")
             $success &= execute("DELETE FROM contracts");
@@ -405,7 +409,7 @@
         $max = getScores($_SESSION["team_id"])["cash"];
         $message = NULL;
 
-        if ($_POST["to"] === ADMIN_LOGIN_NAME) {
+        if (in_array($_POST["to"], ADMIN_LOGIN_NAMES, true)) {
             if (!parseBool(getSetting(Setting::SUPPORT_MESSAGES)) || !isset($_POST["message"]))
                 die();
             else
@@ -441,7 +445,7 @@
                 }
                 else {
                     execute("INSERT INTO notifications(team_id, content, category) VALUES(:team_id, :content, :category)", array("team_id" => $to_id, "content" => "Team '" . $from_name . "' sent you a private message '" . $message . "'", "category" => NotificationCategory::RECEIVED_PRIVATE));
-                    execute("INSERT INTO notifications(team_id, content, category) VALUES(:team_id, :content, :category)", array("team_id" => $_SESSION["team_id"], "content" => "You sent a private message '" . $message . "' to" . ($_POST["to"] === ADMIN_LOGIN_NAME ? "" : " team") . " '" . $to_name . "'", "category" => NotificationCategory::SENT_PRIVATE));
+                    execute("INSERT INTO notifications(team_id, content, category) VALUES(:team_id, :content, :category)", array("team_id" => $_SESSION["team_id"], "content" => "You sent a private message '" . $message . "' to" . (in_array($_POST["to"], ADMIN_LOGIN_NAMES, true) ? "" : " team") . " '" . $to_name . "'", "category" => NotificationCategory::SENT_PRIVATE));
                 }
             }
         }

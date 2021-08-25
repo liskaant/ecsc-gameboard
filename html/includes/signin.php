@@ -11,13 +11,13 @@
         if (isset($_POST["login"]) && isset($_POST["password"])) {
 
             $_SESSION["_login_name"] = $_POST["login"];
-            if ($_POST["login"] !== ADMIN_LOGIN_NAME)
+            if (!in_array($_POST["login"], ADMIN_LOGIN_NAMES, true))
                 $time_out = $error = !checkStartEndTime();
 
             if (CAPTCHA_ENABLED) {
                 if (!isset($_POST["captcha"]) || !isset($_SESSION["captcha_text"]) || strtoupper($_POST["captcha"]) !== strtoupper($_SESSION["captcha_text"]))
                     $wrong_captcha = $error = true;
-                
+
                 if (isset($_SESSION["captcha_text"]))
                     unset($_SESSION["captcha_text"]);
             }

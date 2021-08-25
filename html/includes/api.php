@@ -19,8 +19,8 @@
 
     if ($method === "auth") {
         if ($args[0] === "token") {
-            if ($body["username"] === ADMIN_LOGIN_NAME) {
-                $rows = fetchAll("SELECT password_hash FROM teams WHERE login_name=:login", array("login" => ADMIN_LOGIN_NAME));
+            if (in_array($body["username"], ADMIN_LOGIN_NAMES, true)) {
+                $rows = fetchAll("SELECT password_hash FROM teams WHERE login_name=:login", array("login" => $body["username"]));
                 if (count($rows) === 1)
                     if (password_verify($body["password"], $rows[0]["password_hash"])) {
                         $token = generateRandomString(32);

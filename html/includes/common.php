@@ -17,7 +17,6 @@
     define("PATHDIR", dirname(preg_replace("/[^a-zA-Z0-9\/._-]/", "", $_SERVER["PHP_SELF"])));
     define("MOMENTUM_STEPS", 30);
     define("MIN_CASH_VALUE", 0);
-    define("ADMIN_LOGIN_NAME", "admin");
     define("TITLE", "ECSC " . date("Y"));
     define("DEFAULT_ROOM", "general");
     define("PRIVATE_ROOM", "team");
@@ -37,6 +36,8 @@
     define("DEFAULT_INITIAL_AVAILABILITY", 100000);
     define("DEFAULT_DYNAMIC_SOLVE_THRESHOLD", 20);
     define("DEFAULT_DYNAMIC_MAXIMUM_DECAY", 50);
+
+    const ADMIN_LOGIN_NAMES = ["admin"];
 
     if (isset($_SERVER['REMOTE_ADDR']))
         // Reference: https://stackoverflow.com/a/2886224
@@ -106,7 +107,7 @@
     $_SESSION["conn_error"] = "";
 
     function isAdmin() {
-        return (isset($_SESSION["login_name"]) && ($_SESSION["login_name"] === ADMIN_LOGIN_NAME));
+        return (isset($_SESSION["login_name"]) && in_array($_SESSION["login_name"], ADMIN_LOGIN_NAMES, true));
     }
 
     $VALID_PAGES = isAdmin() ? array("teams", "contracts", "notifications", "logs", "stats", "chat", "scoreboard") : array("rankings", "jobboard", "contracts", "notifications", "chat", "scoreboard");
@@ -366,7 +367,9 @@
         $rankings = array();
 
         if (getSetting(Setting::CTF_STYLE) === "ad") {
-            $rows = fetchAll("SELECT teams.team_id,teams.full_name FROM teams WHERE teams.login_name!=:admin_login_name", array("admin_login_name" => ADMIN_LOGIN_NAME));
+            $rows = fetchAll("SELECT teams.team_id,teams.full_name,teams.login_name FROM teams");
+            $rows = array_filter($rows, fn($user) => !in_array($user['login_name'], ADMIN_LOGIN_NAMES, true));
+
             foreach ($rows as $row)
                 $teams[$row["team_id"]] = array("full_name" => $row["full_name"]);
 
@@ -390,7 +393,9 @@
             });
         }
         else {
-            $rows = fetchAll("SELECT teams.team_id,teams.full_name,UNIX_TIMESTAMP(x.ts) AS ts FROM teams LEFT JOIN (SELECT team_id,MAX(ts) AS ts FROM solved GROUP BY team_id)x ON teams.team_id=x.team_id WHERE teams.login_name!=:admin_login_name ORDER BY x.ts DESC", array("admin_login_name" => ADMIN_LOGIN_NAME));
+            $rows = fetchAll("SELECT teams.team_id,teams.full_name,UNIX_TIMESTAMP(x.ts) AS ts,teams.login_name FROM teams LEFT JOIN (SELECT team_id,MAX(ts) AS ts FROM solved GROUP BY team_id)x ON teams.team_id=x.team_id ORDER BY x.ts DESC");
+            $rows = array_filter($rows, fn($user) => !in_array($user['login_name'], ADMIN_LOGIN_NAMES, true));
+
             foreach ($rows as $row)
                 $teams[$row["team_id"]] = array("full_name" => $row["full_name"], "ts" => $row["ts"]);
 
@@ -487,9 +492,10 @@
 
     function getTeams() {
         $result = array();
-        $_ = fetchAll("SELECT team_id FROM teams WHERE login_name!=:admin_login_name ORDER BY team_id ASC", array("admin_login_name" => ADMIN_LOGIN_NAME), PDO::FETCH_COLUMN);
-        foreach ($_ as $team_id)
-            array_push($result, $team_id);
+        $_ = fetchAll("SELECT team_id, login_name FROM teams ORDER BY team_id ASC");
+        $_ = array_filter($_, fn($user) => !in_array($user['login_name'], ADMIN_LOGIN_NAMES, true));
+        foreach ($_ as $team)
+            array_push($result, $team['team_id']);
         return $result;
     }
 
@@ -544,7 +550,7 @@
         if ($args !== null)
             foreach ($args as $key => $value) {
                 $key = ":" . $key;
-                $stmt->bindValue($key, $value); 
+                $stmt->bindValue($key, $value);
             }
 
         $stmt->execute();
@@ -566,7 +572,7 @@
         if ($args !== null)
             foreach ($args as $key => $value) {
                 $key = ":" . $key;
-                $stmt->bindValue($key, $value); 
+                $stmt->bindValue($key, $value);
             }
 
         try {
