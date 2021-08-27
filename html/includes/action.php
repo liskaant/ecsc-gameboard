@@ -113,6 +113,7 @@
         header("Content-Length: " . strlen($output));
         header("Connection: close");
 
+        logMessage("Database exported", LogLevel::DEBUG);
         die($output);
     }
     else if (isAdmin() && ($_POST["action"] === "import") && (isset($_POST["contract_id"]))) {
@@ -159,9 +160,11 @@
 
         $success = strlen($output) === 0;
 
-        if ($success)
+        if ($success) {
+            logMessage("Database imported", LogLevel::DEBUG);
             die("<html><head><meta http-equiv='refresh' content='1;url='" . PATHDIR . " /></head>OK</html>");
-        else {
+        } else {
+            logMessage("Database import failed", LogLevel::DEBUG, $output);
             header("HTTP/1.1 500 Internal Server Error");
             die($output);
         }
