@@ -10,7 +10,7 @@
     register_shutdown_function("fatal_handler");
 
     define("DEBUG", file_exists("../.debug"));
-    define("MYSQL_SERVER", "database");
+    define("MYSQL_SERVER", getenv("MYSQL_SERVER") ?: "database");
     define("MYSQL_USERNAME", getenv('MYSQL_USER'));
     define("MYSQL_PASSWORD", getenv('MYSQL_PASSWORD'));
     define("MYSQL_DATABASE", getenv('MYSQL_DATABASE'));
@@ -37,7 +37,13 @@
     define("DEFAULT_DYNAMIC_SOLVE_THRESHOLD", 20);
     define("DEFAULT_DYNAMIC_MAXIMUM_DECAY", 50);
 
-    const ADMIN_LOGIN_NAMES = ["admin"];
+    if(!empty(getenv("ADMIN_LOGIN_NAMES")))
+        define('ADMIN_LOGIN_NAMES', explode(',', getenv("ADMIN_LOGIN_NAMES")));
+    else
+        define('ADMIN_LOGIN_NAMES', ["admin"]);
+
+    if(getenv("SESSION_COOKIE_SECURE"))
+        ini_set("session.cookie_secure", "1");
 
     if (isset($_SERVER['REMOTE_ADDR']))
         // Reference: https://stackoverflow.com/a/2886224
