@@ -105,7 +105,7 @@
         die($output);
     }
     else if (isAdmin() && ($_POST["action"] === "export")) {
-        $output = shell_exec("mysqldump --no-tablespaces --user='" . MYSQL_USERNAME . "' --password='" . MYSQL_PASSWORD . "' --host='" . MYSQL_SERVER . "' '" . MYSQL_DATABASE . "' 2>&1 | grep -v 'Using a password on the command line interface can be insecure'");
+        $output = shell_exec("mysqldump --no-tablespaces --user='" . MYSQL_USERNAME . "' --password='" . MYSQL_PASSWORD . "' --host='" . MYSQL_SERVER . "' --port='" . MYSQL_PORT . "' '" . MYSQL_DATABASE . "' 2>&1 | grep -v 'Using a password on the command line interface can be insecure'");
         $output = isset($output) ? $output : "";
 
         header("Content-Type: application/octet-stream");
@@ -155,7 +155,7 @@
         }
     }
     else if (isAdmin() && ($_POST["action"] === "import")) {
-        $output = shell_exec("mysql --user='" . MYSQL_USERNAME . "' --password='" . MYSQL_PASSWORD . "' --host='" . MYSQL_SERVER . "' '" . MYSQL_DATABASE . "' 2>&1 < " . $_FILES["import_file"]["tmp_name"] . " | grep -v 'Using a password on the command line interface can be insecure'");
+        $output = shell_exec("mysql --user='" . MYSQL_USERNAME . "' --password='" . MYSQL_PASSWORD . "' --host='" . MYSQL_SERVER . "' --port='" . MYSQL_PORT . "' '" . MYSQL_DATABASE . "' 2>&1 < " . $_FILES["import_file"]["tmp_name"] . " | grep -v 'Using a password on the command line interface can be insecure'");
         $output = isset($output) ? $output : "";
 
         $success = strlen($output) === 0;

@@ -11,6 +11,7 @@
 
     define("DEBUG", file_exists("../.debug"));
     define("MYSQL_SERVER", getenv("MYSQL_SERVER") ?: "database");
+    define("MYSQL_PORT", getenv("MYSQL_PORT") ?: "3306");
     define("MYSQL_USERNAME", getenv('MYSQL_USER'));
     define("MYSQL_PASSWORD", getenv('MYSQL_PASSWORD'));
     define("MYSQL_DATABASE", getenv('MYSQL_DATABASE'));
@@ -107,7 +108,7 @@
         error_reporting(E_ALL);
     }
 
-    $conn = new PDO("mysql:host=" . MYSQL_SERVER . ";dbname=" . MYSQL_DATABASE, MYSQL_USERNAME, MYSQL_PASSWORD);
+    $conn = new PDO("mysql:host=" . MYSQL_SERVER . ";port=" . MYSQL_PORT . ";dbname=" . MYSQL_DATABASE, MYSQL_USERNAME, MYSQL_PASSWORD);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $_SESSION["conn_error"] = "";
