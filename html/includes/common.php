@@ -332,14 +332,23 @@
 
                 // Reference: https://github.com/CTFd/DynamicValueChallenge
                 if (parseBool(getSetting(Setting::DYNAMIC_SCORING))) {
-                    $solves = fetchScalar("SELECT COUNT(*) FROM solved JOIN teams ON solved.team_id=teams.team_id WHERE task_id=:task_id AND guest=0", array("task_id" => $task_id));
-                    if (($solves > 0) && $solver)
-                        $solves -= 1;
-                    $threshold = is_numeric(getSetting(Setting::DYNAMIC_SOLVE_THRESHOLD)) ? getSetting(Setting::DYNAMIC_SOLVE_THRESHOLD) : DEFAULT_DYNAMIC_SOLVE_THRESHOLD;
-                    $min_percentage = 100.0 - (is_numeric(getSetting(Setting::DYNAMIC_MAXIMUM_DECAY)) ? getSetting(Setting::DYNAMIC_MAXIMUM_DECAY) : DEFAULT_DYNAMIC_MAXIMUM_DECAY);
-                    $max_task_penalty = intval(((100.0 - $min_percentage) / 100.0) * $task_cash);
-                    $task_penalty = intval(1.0 * $max_task_penalty * ($solves ** 2) / ($threshold ** 2));
-                    $task_penalty = min($task_penalty, $max_task_penalty);
+                    //$solves = fetchScalar("SELECT COUNT(*) FROM solved JOIN teams ON solved.team_id=teams.team_id WHERE task_id=:task_id AND guest=0", array("task_id" => $task_id));
+                    //if (($solves > 0) && $solver)
+                    //    $solves -= 1;
+                    //$threshold = is_numeric(getSetting(Setting::DYNAMIC_SOLVE_THRESHOLD)) ? getSetting(Setting::DYNAMIC_SOLVE_THRESHOLD) : DEFAULT_DYNAMIC_SOLVE_THRESHOLD;
+                    //$min_percentage = 100.0 - (is_numeric(getSetting(Setting::DYNAMIC_MAXIMUM_DECAY)) ? getSetting(Setting::DYNAMIC_MAXIMUM_DECAY) : DEFAULT_DYNAMIC_MAXIMUM_DECAY);
+                    //$max_task_penalty = intval(((100.0 - $min_percentage) / 100.0) * $task_cash);
+                    //$task_penalty = intval(1.0 * $max_task_penalty * ($solves ** 2) / ($threshold ** 2));
+                    //$task_penalty = min($task_penalty, $max_task_penalty);
+
+                    $num_solves = fetchScalar("SELECT COUNT(*) FROM solved JOIN teams ON solved.team_id=teams.team_id WHERE task_id=:task_id AND guest=0", array("task_id" => $task_id));
+                    $num_teams = count(array_filter(fetchColumn("SELECT login_name FROM teams WHERE guest=0"), fn($user) => !in_array($user, ADMIN_LOGIN_NAMES, true)));
+                    $min_cash = 75;
+                    $decay_constant = 2.5;
+                    $p = 1 - (($num_solves - 1) / $num_teams);
+                    $v = $p < 0.5 ? (2**($decay_constant-1)*$p**$decay_constant) : (1-((-2*$p+2)**$decay_constant)/2);
+                    $result_points = floor($min_cash + $v * ($task_cash - $min_cash));
+                    $task_penalty = $task_cash - $result_points;
                 }
 
 // NOTE: old formula stuff
