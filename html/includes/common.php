@@ -343,9 +343,11 @@
 
                     $num_solves = fetchScalar("SELECT COUNT(*) FROM solved JOIN teams ON solved.team_id=teams.team_id WHERE task_id=:task_id AND guest=0", array("task_id" => $task_id));
                     $num_teams = count(array_filter(fetchAll("SELECT login_name FROM teams WHERE guest=0"), fn($user) => !in_array($user['login_name'], ADMIN_LOGIN_NAMES, true)));
+                    if($num_solves > 0 && $solver)
+                        $num_solves -= 1;
                     $min_cash = 75;
                     $decay_constant = 2.5;
-                    $p = 1 - (($num_solves - 1) / $num_teams);
+                    $p = 1 - ($num_solves / $num_teams);
                     $v = $p < 0.5 ? (2**($decay_constant-1)*$p**$decay_constant) : (1-((-2*$p+2)**$decay_constant)/2);
                     $result_points = floor($min_cash + $v * ($task_cash - $min_cash));
                     $task_penalty = $task_cash - $result_points;
