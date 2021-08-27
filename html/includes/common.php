@@ -679,7 +679,7 @@
 
     function logMessage($message, $level=LogLevel::INFO, $details=null) {
         $team_id = isset($_SESSION["team_id"]) ? $_SESSION["team_id"] : null;
-        $remote_ip = $_SERVER["REMOTE_ADDR"];
+        $remote_ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER["REMOTE_ADDR"];
         return execute("INSERT INTO logs(level, team_id, remote_ip, message, details) VALUES(:level, :team_id, :remote_ip, :message, :details)", array("level" => $level, "team_id" => $team_id, "remote_ip" => $remote_ip, "message" => $message, "details" => $details));
     }
 
