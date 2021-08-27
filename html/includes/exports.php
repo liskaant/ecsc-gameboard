@@ -4,6 +4,7 @@
     $callback = isset($_GET["callback"]) ? preg_replace("/[^A-Za-z0-9 ]/", '', $_GET["callback"]) : null;
 
     if (endsWith(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/scores.json")) {
+        header("Access-Control-Allow-Origin: *");
         if (is_null($callback))
             header("Content-Type: application/json; charset=utf-8");
         else
@@ -46,6 +47,7 @@
     }
 
     else if (endsWith(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/scores.xml")) {
+        header("Access-Control-Allow-Origin: *");
         header("Content-Type: application/xml; charset=utf-8");
 
         if (file_exists("scores.xml"))
@@ -100,6 +102,7 @@
     }
 
     else if (endsWith(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/stats.json")) {
+        header("Access-Control-Allow-Origin: *");
         if (is_null($callback))
             header("Content-Type: application/json; charset=utf-8");
         else
@@ -136,6 +139,7 @@
     }
 
     else if (endsWith(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH), "/stats.xml")) {
+        header("Access-Control-Allow-Origin: *");
         header("Content-Type: application/xml; charset=utf-8");
 
         if (file_exists("stats.xml"))
