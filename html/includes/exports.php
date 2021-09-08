@@ -31,7 +31,7 @@
                 else
                     $_place = null;
 
-                $_ = array("name" => $row["full_name"], "login_name => $row["login_name"], "code" => $row["country_code"], "country" => array_key_exists($row["country_code"], COUNTRIES) ? COUNTRIES[$row["country_code"]] : "", "score" => $scores["cash"], "place" => $_place, "guest" => intval($row["guest"]) != 0);
+                $_ = array("name" => $row["full_name"], "login_name" => $row["login_name"], "code" => $row["country_code"], "country" => array_key_exists($row["country_code"], COUNTRIES) ? COUNTRIES[$row["country_code"]] : "", "score" => $scores["cash"], "place" => $_place, "guest" => intval($row["guest"]) != 0);
                 array_push($result, $_);
             }
 
@@ -69,7 +69,7 @@
                 else
                     $_place = null;
 
-                $_ = array("name" => $row["full_name"], "code" => $row["country_code"], "country" => array_key_exists($row["country_code"], COUNTRIES) ? COUNTRIES[$row["country_code"]] : "", "score" => $scores["cash"], "place" => $_place, "guest" => intval($row["guest"]) != 0);
+                $_ = array("name" => $row["full_name"], "login_name" => $row["login_name"], "code" => $row["country_code"], "country" => array_key_exists($row["country_code"], COUNTRIES) ? COUNTRIES[$row["country_code"]] : "", "score" => $scores["cash"], "place" => $_place, "guest" => intval($row["guest"]) != 0);
                 array_push($result, $_);
             }
 
