@@ -9,6 +9,7 @@
 
         if (count($visible) > 0) {
             echo "                                <div id=\"accordion\">\n";
+            echo('<div class="alert alert-info border" role="alert"><span style="line-height: 24px">The standard flag format is: <code>ECSC{[\w?-]+}</code>. Flag is not wrapped in <code>ECSC{}</code> or in any other wrapper unless marked as <code>Standard flag format</code> or otherwise stated. Flags are case sensitive unless stated otherwise.</span></div>');
 
             foreach ($visible as $contract_id) {
                 $contract = fetchAll("SELECT contracts.title, contracts.description, contracts.categories, SUM(tasks.cash) AS cash, SUM(tasks.awareness) AS awareness FROM contracts JOIN tasks ON contracts.contract_id=tasks.contract_id WHERE contracts.contract_id=:contract_id GROUP BY(contracts.contract_id)", array("contract_id" => $contract_id))[0];
