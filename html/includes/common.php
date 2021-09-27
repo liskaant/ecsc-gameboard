@@ -31,7 +31,7 @@
     define("DETAILS_WRAP_LENGTH", 30);
     define("CHAT_TRUNCATE_LENGTH", 128);                // Note: maximum chat message length for non-admin
     define("PRIVATE_TRUNCATE_LENGTH", 256);             // Note: maximum private message length for non-admin
-    define("OFFICIAL_RULES_URL", "https://ecsc.eu/about/ecscrules.pdf/download");
+    define("OFFICIAL_RULES_URL", "https://ecsc2021.cz/dwnld/competition/Rules.pdf");
     define("TOKEN_LIFE", 4 * 24 * 3600);
     define("SAME_CASH_SAME_RANK", false);
     define("DEFAULT_INITIAL_AVAILABILITY", 100000);
