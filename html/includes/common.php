@@ -240,7 +240,7 @@
         }
 
         if (parseBool(getSetting(Setting::HIDE_TEAM_SCORES))) {
-            if (!isAdmin() && ($team_id != $_SESSION["team_id"])) {
+            if (!isAdmin() && isset($_SESSION["team_id"]) && ($team_id != $_SESSION["team_id"])) {
                 $result["cash"] = 0;
                 $result["awareness"] = 0;
                 $result["flags"] = 0;
@@ -424,7 +424,7 @@
             });
         }
         else {
-            if(parseBool(getSetting(Setting::HIDE_TEAM_SCORES)) && !isAdmin())
+            if(parseBool(getSetting(Setting::HIDE_TEAM_SCORES)) && !isAdmin() && isset($_SESSION["team_id"]))
                 $rows = fetchAll("SELECT teams.team_id,teams.full_name,UNIX_TIMESTAMP(x.ts) AS ts,teams.login_name FROM teams LEFT JOIN (SELECT team_id,MAX(ts) AS ts FROM solved GROUP BY team_id)x ON teams.team_id=x.team_id WHERE teams.team_id=:team_id ORDER BY x.ts DESC", ["team_id" => $_SESSION["team_id"]]);
             else
                 $rows = fetchAll("SELECT teams.team_id,teams.full_name,UNIX_TIMESTAMP(x.ts) AS ts,teams.login_name FROM teams LEFT JOIN (SELECT team_id,MAX(ts) AS ts FROM solved GROUP BY team_id)x ON teams.team_id=x.team_id ORDER BY x.ts DESC");
